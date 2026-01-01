@@ -1,0 +1,25 @@
+[Unit]
+Description=FastAPI Backup + YubiKey Warm-Up Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Run as your user (important for GPG, YubiKey, restic password file, etc.)
+User=fraser
+WorkingDirectory=/var/home/fraser/backup_service
+
+# Use uv to run uvicorn
+ExecStart=/var/home/fraser/.cargo/bin/uv run uvicorn main:app --host 127.0.0.1 --port 8000
+
+# Restart on failure
+Restart=on-failure
+RestartSec=5
+
+# Environment variables (optional but recommended)
+Environment=PYTHONUNBUFFERED=1
+
+# Ensure systemd doesn't sandbox away your home directory
+ProtectHome=no
+
+[Install]
+WantedBy=multi-user.target
