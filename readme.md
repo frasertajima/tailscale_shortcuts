@@ -1,15 +1,15 @@
 
 # 🚀 **Remote Backup + YubiKey Warm‑Up Workflow (extensible to any python script)**
 
-_A fully automated, Tailscale‑secured, cross‑platform orchestration system triggered from your Pixel or iOS device. This is much faster than opening a command line and typing “uv run backup.py” every day for example._
+_A Tailscale‑secured, cross‑platform orchestration system triggered from your Pixel or iOS device. This is faster than opening a command line and typing “uv run backup.py” for example._
 
 ---
 
-## 🟦 **1. Your Pixel triggers everything**
+## 🟦 **1. Your Pixel or iOS device triggers everything**
 
-You use MacroDroid on your Pixel to send an authenticated HTTP POST to your ThinkPad over Tailscale.
+You use MacroDroid on your Pixel or shortcuts on your iOS device to send an authenticated HTTP POST to your ThinkPad over Tailscale.
 
-Two triggers exist:
+Two triggers exist (which need to be modified for your user specifications):
 
 - `/backup` → runs your full backup pipeline
 - `/kleopatra` → warms up your YubiKey + GPG stack
@@ -24,7 +24,7 @@ No friction.
 
 ## 🟦 **2. Tailscale provides the secure transport**
 
-Your Pixel and ThinkPad communicate over your private Tailscale network:
+Your Pixel or iOS device and ThinkPad communicate over your private Tailscale network:
 
 ```
 https://thinkpad-p16.tailXXXX.ts.net/backup
@@ -39,7 +39,6 @@ This gives you:
 - no port forwarding
 - no exposure to the public internet
 
-It’s a perfect backbone for this kind of automation.
 
 ---
 
@@ -57,7 +56,7 @@ Each endpoint:
 - immediately returns a JSON response
 - offloads the real work to a **BackgroundTask**
 - keeps the API responsive
-- avoids blocking your Pixel
+- avoids blocking your Pixel/iOS device
 
 ---
 
@@ -128,7 +127,7 @@ It prepares your entire cryptographic environment so Kleopatra and GPG are ready
 
 ## 🟦 **7. The whole system is hands‑free**
 
-From your Pixel, you can now:
+From your Pixel/iOS device, you can now:
 
 ### 🔹 Warm up your YubiKey
 
@@ -146,63 +145,21 @@ POST /backup
 
 (just trigger both macros)
 
-You can literally be in another room, say “run backup mode” (or tap a tile), and your ThinkPad:
+You can be in another room, say “initiate backup” to Siri in iOS (or tap a tile), and your ThinkPad:
 
-- warms up the YubiKey
-- decrypts/signs test messages
 - runs your backup
 - logs everything
 - stays fully secure
 
----
+Yubikey warmup requires entering the PIN and touching biometrics for security (but it is still faster than typing "uv run kleopatra.py").
 
-# 🌟 **Why this workflow is attractive**
 
-Because it hits all the engineering ideals you care about:
-
-### ✔ **Reproducible**
-
-Containerized Python, deterministic scripts, no hidden state.
-
-### ✔ **Secure**
-
-Tailscale, YubiKey, no public exposure, no cloud dependencies.
-
-### ✔ **Cross‑platform**
-
-Pixel → Tailscale → FastAPI → Distrobox → Host → YubiKey.
-
-### ✔ **Non‑interactive**
-
-Except for intentional YubiKey touch/PIN.
-
-### ✔ **Modular**
-
-Backup and warm‑up are separate, composable endpoints.
-
-### ✔ **Elegant**
-
-Every component does one job well.
-
----
-
-# 🎉 It’s a _designed system_ — clean, modern, secure, and reproducible.
-
-If you want, we can keep going:
-
-- add `/status`
-- add `/health`
-- add `/mount`
-- add `/upgrade`
-- add journald logging
-- add a web dashboard
-- combine warm‑up + backup into a single endpoint
 
 ---
 
 # 🧩 **FULL WORKFLOW SUMMARY — Remote Backup + YubiKey Warm‑Up System**
 
-Below is the complete architecture, broken into clear phases:
+Below is the complete architecture:
 
 - Host setup
 - Container setup
@@ -236,8 +193,10 @@ Inside this directory you placed:
 This directory is the entire automation brain. 
 
 Install fastapi in the `backup_service` directory:
-`uv init --python 3.14
-`uv add fastapi uvicorn[standard]
+
+`uv init --python 3.14`
+
+`uv add fastapi uvicorn[standard]`
 
 ---
 
@@ -265,11 +224,11 @@ This script is now called by FastAPI. Test it locally in the `backup_service` di
 
 Restic supports creating a password inside a file:
 
-`/var/home/fraser/.restic_password
+`/var/home/##username##/.restic_password`
 
 hide the file from everyone except yourself:
 
-`chmod 600 ~/.restic_password
+`chmod 600 ~/.restic_password`
 
 we then updated our script to use the password in the file:
 
@@ -282,24 +241,24 @@ commands = [
 ```
 
 To confirm it is working locally:
-`curl -X POST http://127.0.0.1:8000/backup
+`curl -X POST http://127.0.0.1:8000/backup`
 
 should produce:
-`{"status":"backup_started"}
+`{"status":"backup_started"}`
 
 Tailscale needs to be configured to allow magicDNS (on the tailscale website) and tailscale serve on the computer:
 
-`sudo tailscale serve --bg --https=443 127.0.0.1:8000
+`sudo tailscale serve --bg --https=443 127.0.0.1:8000`
 
 resulting in:
 
 ```
 Available within your tailnet:
 
-https://thinkpad-p16.tail9b163.ts.net/
+https://thinkpad-p16.tailXXXX.ts.net/
 |-- proxy http://127.0.0.1:8000
 
-https://thinkpad-p16.tail9b163.ts.net/443
+https://thinkpad-p16.tailXXXX.ts.net/443
 |-- proxy http://127.0.0.1:8000
 
 Serve started and running in the background.
@@ -309,7 +268,7 @@ To disable the proxy, run: tailscale serve --https=443 off
 
 from the pixel, we should install tailscale and in the browser go to:
 
-`https://thinkpad-p16.tailXXXX.ts.net/443/docs
+`https://thinkpad-p16.tailXXXX.ts.net/443/docs`
 
 select the backup option and press it to run the fastapi command.
 
@@ -321,8 +280,8 @@ INFO:     Started server process [430526]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-INFO:     100.70.206.4:0 - "GET /openapi.json HTTP/1.1" 200 OK
-INFO:     100.70.206.4:0 - "POST /backup HTTP/1.1" 200 OK
+INFO:     100.xx.xxx.4:0 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     100.xx.xxx.4:0 - "POST /backup HTTP/1.1" 200 OK
 ```
 
 
@@ -692,7 +651,7 @@ Inside the container:
 
 - install Python
 - install `uv`
-- install restic (restic works better in a distrobox than Fedora Silverblue host)
+- install restic (restic works in a distrobox rather than the Fedora Silverblue host)
 - configure your backup environment
 
 ### Restic password file (host)
@@ -912,12 +871,15 @@ Before creating shortcuts:
 
 1. Install Tailscale from the App Store
 2. Log in and connect
-3. Enable:• Use Tailscale DNS
+3. Enable:
+
+• Use Tailscale DNS
+
 • MagicDNS (must be enabled in the Tailscale admin console)
 
-4. Ensure Local Network Access is enabled (may be obsolete?):
+5. Ensure Local Network Access is enabled (may be obsolete?):
 Settings → Tailscale → Local Network → ON
-5. If the hostname doesn’t resolve, toggle Tailscale off/on to refresh DNS
+6. If the hostname doesn’t resolve, toggle Tailscale off/on to refresh DNS
 
 
 You must be able to open the appropriate device page (as described by Tailscale) in order to get the API endpoints for automation:
@@ -940,13 +902,22 @@ from Safari (or Firefox) on iOS.
 For YubiKey warm‑up:https://thinkpad-p16.tailXXXX.ts.net/kleopatra
 
 7. Tap Show More
-8. Set:• Method: POST
+8. Set:
+
+• Method: POST
+
 • Request Body: JSON
+
 • Body: {}
-• Headers:• Key: Content-Type
+
+• Headers:
+
+• Key: Content-Type
+
 • Value: application/json
 
 Make sure to hardcode the URL (iOS likes to default to clipboard or shortcut input but that slows the workflow down). Changing “URL” to the hardcoded URL was not immediately obvious.
+
 ---
 
 3. Rename the Shortcut (Important for Siri)
@@ -958,7 +929,9 @@ To rename:
 1. Tap the ••• (three dots) on the shortcut (again, not the most obvious location; in iOS 26.1 it was on the top left as a ^ pointing down)
 2. Tap the name at the top
 3. Enter a clear, Siri‑friendly name such as:
+
 • Initiate Backup
+
 • Initiate Security Key
 
 4. Tap Done
@@ -988,6 +961,7 @@ Once renamed, Siri automatically recognizes the shortcut.
 You can now say:
 
 • “Hey Siri, initiate backup”
+
 • “Hey Siri, initiate security key”
 
 
@@ -1000,9 +974,10 @@ Siri will run the shortcut exactly as defined—no interpretation layer, no rewr
 You now have:
 
 • A fully functional iOS Shortcut that sends a POST request over Tailscale
+
 • A Home Screen button for instant triggering
+
 • A Siri phrase that reliably activates your ThinkPad automation
+
 • Cross‑platform parity with your Android MacroDroid setup
 
-
-This completes the iOS automation portion of the workflow.
