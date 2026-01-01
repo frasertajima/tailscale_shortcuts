@@ -40,18 +40,30 @@ def run_backup():
 
 
 def run_kleopatra():
-    subprocess.Popen(
-        ["uv", "run", str(KLEO_SCRIPT)],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
+    p = subprocess.Popen(
+        ["/var/home/fraser/.cargo/bin/uv", "run", str(KLEO_SCRIPT)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
     )
+    out, err = p.communicate()
+
+    with open("/var/home/fraser/backup_service/kleopatra.log", "a") as f:
+        f.write("\n=== KLEOPATRA TRIGGERED ===\n")
+        f.write("STDOUT:\n")
+        f.write(out or "")
+        f.write("\nSTDERR:\n")
+        f.write(err or "")
+        f.write("\n=== END ===\n")
+
 
 @app.post("/backup")
-def trigger_backup(tasks: BackgroundTasks):
-    tasks.add_task(run_backup)
+def trigger_backup(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_backup)
     return {"status": "backup_started"}
 
+
 @app.post("/kleopatra")
-def trigger_kleopatra(tasks: BackgroundTasks):
-    tasks.add_task(run_kleopatra)
+def trigger_kleopatra(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_kleopatra)
     return {"status": "kleopatra_started"}
