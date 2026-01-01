@@ -3,6 +3,8 @@
 
 _A Tailscale‑secured, cross‑platform orchestration system triggered from your Pixel or iOS device. This is faster than opening a command line and typing “uv run backup.py” for example._
 
+_January 1, 2026: Kleopatra script is now fully remote capable and hands free with no user intervention for PIN required. A new kleopatra.log will indicate whether it worked. backup_service.service was updated to work properly upon reboot. main.py was updated to incorporate the improvements._
+
 ---
 
 ## 🟦 **1. Your Pixel or iOS device triggers everything**
