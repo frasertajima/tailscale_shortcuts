@@ -3,13 +3,15 @@
 
 _A Tailscale‑secured, cross‑platform orchestration system triggered from your Pixel or iOS device. This is faster than opening a command line and typing “uv run backup.py” for example._
 
-_January 1, 2026: Kleopatra script is now fully remote capable and hands free with no user intervention for PIN required. A new kleopatra.log will indicate whether it worked. backup_service.service was updated to work properly upon reboot. main.py was updated to incorporate the improvements._
+---
+
+_January 1, 2026: Kleopatra script is now fully remote capable and hands free with no user intervention for PIN required. A new kleopatra.log will indicate whether it worked. backup_service.service was updated to work properly upon reboot. main.py was updated to incorporate the improvements. Make sure to add polkit as outlined below to enable pcscd to be reset without the need for user intervention of sudo._
 
 ---
 
 🟩 I found `sudo systemctl restart pcscd` was needed in Fedora Silverblue on reboot when the card was not recognised — Add a polkit rule to avoid the need for sudo in the script:
 
-This allows your user to restart pcscd without a password.
+This allows you to restart pcscd without a password.
 
 Create:
 
@@ -116,12 +118,12 @@ This script:
 
 - restarts `pcscd`
 - forces YubiKey detection
-- decrypts a test file
-- clearsigns a test message
+- decrypts a test file (removed as not needed)
+- clearsigns a test message (depreciated as not needed)
 - runs your NVIDIA kernel‑arg checker
-- ensures GPG + YubiKey are fully warmed up
+- ensures GPG + YubiKey are fully warmed up for Kleopatra and gpg
 
-All non‑interactive except for YubiKey touch/PIN.
+without the need for user interaction, YubiKey touches or PINs or restarting pcscd with sudo.
 
 ---
 
@@ -134,9 +136,8 @@ All non‑interactive except for YubiKey touch/PIN.
 - safe to run remotely
 - immune to shell quoting issues
 - immune to missing environment variables
-- touch‑only (if you choose to configure it that way)
 
-It prepares your entire cryptographic environment so Kleopatra and GPG are ready the moment you sit down.
+It prepares your entire cryptographic environment so Kleopatra and GPG are ready the moment you sit down and can be triggered remotely.
 
 ---
 
@@ -177,9 +178,7 @@ You can be in another room, say “initiate backup” to Siri in iOS (or tap a t
 - logs everything
 - stays fully secure
 
-Yubikey warmup requires entering the PIN and touching biometrics for security (but it is still faster than typing "uv run kleopatra.py").
-
-
+The same is now true for YubiKey warmup with "initiate security key" in Siri (even remotely).
 
 ---
 
@@ -318,6 +317,7 @@ INFO:     100.xx.xxx.4:0 - "POST /backup HTTP/1.1" 200 OK
 On the host:
 
 - You wrote `kleopatra.py`
+- You setup polkit as outlined at the top of this readme.md to enable pscsd reset without sudo
 - You fixed:
     - missing test file
     - missing shebang
@@ -336,11 +336,11 @@ This confirmed:
 
 - `pcscd` restarts
 - `gpg --card-status` works
-- decrypt test works
-- clearsign test works
-- YubiKey PIN prompts behave correctly
+- decrypt test works (removed)
+- clearsign test works (depreciated and may fail in the log: ignore)
+- YubiKey PIN prompts behave correctly (removed)
 - `nvidia-check.sh` runs
-- the script is fully non‑interactive except for touch/PIN
+- the script is fully non‑interactive
 
 This script is now callable remotely.
 
@@ -404,36 +404,7 @@ Run:
 sudo nano /etc/systemd/system/backup_service.service
 ```
 
-Paste the full service file into the editor:
-
-```
-[Unit]
-Description=FastAPI Backup + YubiKey Warm-Up Service
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-# Run as your user (important for GPG, YubiKey, restic password file, etc.)
-User=###USERNAME###
-WorkingDirectory=/var/home/###USERDIRECTORY###/backup_service
-
-# Use uv to run uvicorn
-ExecStart=/var/home/###USERDIRECTORY###/.cargo/bin/uv run uvicorn main:app --host 127.0.0.1 --port 8000
-
-# Restart on failure
-Restart=on-failure
-RestartSec=5
-
-# Environment variables (optional but recommended)
-Environment=PYTHONUNBUFFERED=1
-
-# Ensure systemd doesn't sandbox away your home directory
-ProtectHome=no
-
-[Install]
-WantedBy=multi-user.target
-```
-
+Paste the full `backup_service.service` file contents into the editor (refer to the updated file in the github repository for `backup_service.service`). 
 
 Save with:
 
@@ -852,6 +823,7 @@ ThinkPad FastAPI (main.py)
 - YubiKey ensures hardware‑backed crypto
 - No public ports are open
 - No passwords are transmitted over the network
+- YubiKey PIN is not entered
 
 ---
 
