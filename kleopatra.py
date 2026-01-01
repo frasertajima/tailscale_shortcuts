@@ -1,4 +1,5 @@
 import subprocess
+import time
 from pathlib import Path
 
 STATUS_FILE = Path("/var/home/fraser/backup_service/kleopatra_status.txt")
@@ -17,16 +18,25 @@ def run(cmd, **kwargs):
 def main():
     ok = True
 
-    # 1. Force YubiKey detection
+    # 0. Reset all GnuPG daemons (scdaemon, gpg-agent, etc.)
+    ok &= run(["gpgconf", "--kill", "all"])
+
+    # 1. Restart pcscd (polkit rule allows this without sudo)
+    ok &= run(["systemctl", "restart", "pcscd"])
+
+    # 2. Give pcscd a moment to rebind to the YubiKey
+    time.sleep(1)
+
+    # 3. Force YubiKey detection
     ok &= run(["gpg", "--card-status"])
 
-    # 2. Optional signing test
+    # 4. Optional signing test
     ok &= run([
         "gpg", "--batch", "--yes",
         "--clearsign"
     ], input=b"test")
 
-    # 3. NVIDIA check (optional)
+    # 5. NVIDIA check (optional)
     nvidia_script = BASE_DIR / "nvidia-check.sh"
     if nvidia_script.exists():
         ok &= run([str(nvidia_script)])
