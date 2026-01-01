@@ -7,6 +7,30 @@ _January 1, 2026: Kleopatra script is now fully remote capable and hands free wi
 
 ---
 
+🟩 I found `sudo systemctl restart pcscd` was needed in Fedora Silverblue on reboot when the card was not recognised — Add a polkit rule to avoid the need for sudo in the script:
+
+This allows your user to restart pcscd without a password.
+
+Create:
+
+`sudo nano /etc/polkit-1/rules.d/49-pcscd.rules`
+
+paste into the file:
+
+```
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.systemd1.manage-units" &&
+        action.lookup("unit") == "pcscd.service" &&
+        subject.isInGroup("wheel")) {
+        return polkit.Result.YES;
+    }
+});
+```
+
+Then use the updated kleopatra.py script.
+
+---
+
 ## 🟦 **1. Your Pixel or iOS device triggers everything**
 
 You use MacroDroid on your Pixel or shortcuts on your iOS device to send an authenticated HTTP POST to your ThinkPad over Tailscale.
