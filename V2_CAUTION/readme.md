@@ -3,6 +3,8 @@ _This folder contains version 2 of our tailscale shortcuts that includes a short
 _Normally, the rpm-ostree change requires 'systemctl reboot' but rather than bunch that in with the  
 /nvidia_fix, we also created a separate /reboot automation that can be used (carefully) for all sorts of purposes. This enables the user to remotely fix the nvidia driver and wait until later to reboot._
 
+_You should replace the `main.py` file from version 2 in your original `/backup_services` directory on your local machine if you wish to add /nvidia_fix and /reboot to your automations (they are kept separate if not needed so that the user can add or skip new shortcuts over time). You will also need to add Android and iOS automations as outlined in the earlier documentation with the new endpoints._
+
 # 📘 **How to Update `main.py` and Restart the FastAPI Automation Service**
 
 This document describes the exact steps required to update the automation service and restart it safely.  
@@ -87,6 +89,8 @@ Confirm:
 - `/backup`
 - `/kleopatra`
 - `/nvidia_fix`
+- `/reboot`
+-  `/...`, as new shortcuts are added
 
 all appear and load correctly.
 
