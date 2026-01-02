@@ -5,6 +5,8 @@ _Normally, the rpm-ostree change requires 'systemctl reboot' but rather than bun
 
 _You should replace the `main.py` file from version 2 in your original `/backup_services` directory on your local machine if you wish to add /nvidia_fix and /reboot to your automations (they are kept separate if not needed so that the user can add or skip new shortcuts over time). You will also need to add Android and iOS automations as outlined in the earlier documentation with the new endpoints._
 
+_Also, because these shortcuts operate without user intervention or screen output, you should always review the `***.log` files saved in the `/backup_services` directory to double check that /backup or other shortcuts have completed. Obviously Kleopatra will have worked if you can use the app and /shutdown will be obvious as well, but for shortcuts like /backup, it is useful to make sure all operations worked as expected._
+
 # 📘 **How to Update `main.py` and Restart the FastAPI Automation Service**
 
 This document describes the exact steps required to update the automation service and restart it safely.  
