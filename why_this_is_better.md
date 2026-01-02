@@ -1,7 +1,7 @@
 
 # 🚀 Why this is _better_ than the default Linux smartcard stack
 
-Fedora/Silverblue’s smartcard path is notoriously brittle:
+Fedora Silverblue’s smartcard path is notoriously brittle:
 
 - `pcscd` races USB enumeration
 - `scdaemon` grabs the CCID interface too early
