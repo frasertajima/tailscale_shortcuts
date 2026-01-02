@@ -1,0 +1,146 @@
+from fastapi import FastAPI, BackgroundTasks
+import subprocess
+from pathlib import Path
+
+app = FastAPI()
+
+# Host scripts
+KLEO_SCRIPT = Path("/var/home/fraser/backup_service/kleopatra.py")
+NVIDIA_SCRIPT = Path("/var/home/fraser/backup_service/nvidia_fix.py")
+
+# Container script
+BACKUP_SCRIPT = "/var/home/fraser/backup_service/backup.py"
+CONTAINER_NAME = "fedora42-nvidia"
+
+
+# -----------------------------
+# BACKUP MODULE
+# -----------------------------
+def run_backup():
+    log_path = "/var/home/fraser/backup_service/backup.log"
+
+    with open(log_path, "a") as f:
+        f.write("\n=== BACKUP TRIGGERED ===\n")
+
+    p = subprocess.Popen(
+        [
+            "distrobox", "enter", CONTAINER_NAME,
+            "--",
+            "/var/home/fraser/.cargo/bin/uv", "run",
+            BACKUP_SCRIPT
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+
+    out, err = p.communicate()
+
+    with open(log_path, "a") as f:
+        f.write("STDOUT:\n")
+        f.write(out or "")
+        f.write("\nSTDERR:\n")
+        f.write(err or "")
+        f.write("\n=== END ===\n")
+
+
+# -----------------------------
+# KLEOPATRA MODULE
+# -----------------------------
+def run_kleopatra():
+    p = subprocess.Popen(
+        ["/var/home/fraser/.cargo/bin/uv", "run", str(KLEO_SCRIPT)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+    out, err = p.communicate()
+
+    with open("/var/home/fraser/backup_service/kleopatra.log", "a") as f:
+        f.write("\n=== KLEOPATRA TRIGGERED ===\n")
+        f.write("STDOUT:\n")
+        f.write(out or "")
+        f.write("\nSTDERR:\n")
+        f.write(err or "")
+        f.write("\n=== END ===\n")
+
+
+# -----------------------------
+# NVIDIA FIX MODULE
+# -----------------------------
+def run_nvidia_fix():
+    log_path = "/var/home/fraser/backup_service/nvidia_fix.log"
+
+    with open(log_path, "a") as f:
+        f.write("\n=== NVIDIA FIX TRIGGERED ===\n")
+
+    p = subprocess.Popen(
+        ["/var/home/fraser/.cargo/bin/uv", "run", str(NVIDIA_SCRIPT)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+
+    out, err = p.communicate()
+
+    with open(log_path, "a") as f:
+        f.write("STDOUT:\n")
+        f.write(out or "")
+        f.write("\nSTDERR:\n")
+        f.write(err or "")
+        f.write("\n=== END ===\n")
+
+
+# -----------------------------
+# REBOOT MODULE
+# -----------------------------
+def run_reboot():
+    log_path = "/var/home/fraser/backup_service/reboot.log"
+
+    with open(log_path, "a") as f:
+        f.write("\n=== REBOOT TRIGGERED ===\n")
+
+    p = subprocess.Popen(
+        ["systemctl", "reboot"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+
+    out, err = p.communicate()
+
+    with open(log_path, "a") as f:
+        f.write("STDOUT:\n")
+        f.write(out or "")
+        f.write("\nSTDERR:\n")
+        f.write(err or "")
+        f.write("\n=== END ===\n")
+
+
+# -----------------------------
+# FASTAPI ROUTES
+# -----------------------------
+@app.post("/backup")
+def trigger_backup(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_backup)
+    return {"status": "backup_started"}
+
+
+@app.post("/kleopatra")
+def trigger_kleopatra(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_kleopatra)
+    return {"status": "kleopatra_started"}
+
+
+@app.post("/nvidia_fix")
+def trigger_nvidia_fix(background_tasks: BackgroundTasks):
+    if not NVIDIA_SCRIPT.exists():
+        return {"status": "error", "message": "nvidia_fix.py not found"}
+
+    background_tasks.add_task(run_nvidia_fix)
+    return {"status": "nvidia_fix_started", "message": "System will reboot shortly."}
+
+@app.post("/reboot")
+def trigger_reboot(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_reboot)
+    return {"status": "reboot_started"}
