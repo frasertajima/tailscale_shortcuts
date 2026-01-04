@@ -22,7 +22,7 @@ We will bind VS Code Server **only** to this IP.
 
 ```bash
 # assuming vscode is already installed in a distrobox container run to check it works manually (with your IP):
-code serve-web --host 100.*.*.* --port 8000 --without-connection-token
+code serve-web --host 100.*.*.* --port 8010 --without-connection-token
 ```
 
 ---
@@ -32,7 +32,7 @@ code serve-web --host 100.*.*.* --port 8000 --without-connection-token
 Just open in Safari using your tailscale MagicID details:
 
 ```
-http://##machine_name##.tail###.ts.net:8000/
+http://##machine_name##.tail###.ts.net:8010/
 ```
 
 ---
@@ -60,7 +60,7 @@ jupyter lab --no-browser --ip=100.*.*.* --port=9999 --ServerApp.token='' --Serve
 ```bash
 # run jupyter labs and vscode serve in distrobox container
 jupyter lab --no-browser --ip=100.*.*.* --port=9999 --ServerApp.token='' --ServerApp.password='' &
-code serve-web --host 100.*.*.* --port 8000 --without-connection-token
+code serve-web --host 100.*.*.* --port 8010 --without-connection-token
 ```
 
 ---
@@ -82,7 +82,7 @@ jupyter lab \
 # Start VS Code Server (Microsoft version)
 code serve-web \
   --host 100.*.*.* \
-  --port 8000 \
+  --port 8010 \
   --without-connection-token &
 
 ```
