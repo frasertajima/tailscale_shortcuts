@@ -66,7 +66,7 @@ code serve-web --host 100.*.*.* --port 8000 --without-connection-token
 ---
 # Create shortcut scripts for tailscale automation
 
-/var/home/fraser/backup_service/vscode_on.sh (put in your own IP address):
+/var/home/fraser/backup_service/vscode_on.sh (put in your own IP address and user home folder):
 ```
 #!/usr/bin/env bash
 
@@ -76,7 +76,8 @@ jupyter lab \
   --ip=100.*.*.* \
   --port=9999 \
   --ServerApp.token='' \
-  --ServerApp.password='' &
+  --ServerApp.password='' \
+  --notebook-dir=/home/##user## &
 
 # Start VS Code Server (Microsoft version)
 code serve-web \
