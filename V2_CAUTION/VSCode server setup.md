@@ -104,11 +104,27 @@ chmod +x /var/home/fraser/backup_service/vscode_on.sh
 #!/usr/bin/env bash
 
 # Kill JupyterLab
-pkill -f "jupyter-lab"
-pkill -f "jupyter lab"
+pkill -f "jupyter"
 
-# Kill VS Code Server
-pkill -f "code serve-web"
+
+echo "Shutting down VS Code Server..."
+# Kill code-server directly
+pkill -f "code-server"
+
+# Give it a moment to exit
+sleep 1
+
+# Double-check: kill any leftover node instance bound to your port
+# (only if code-server didn't exit cleanly)
+PIDS=$(ss -tulpn | grep 8010 | awk '{print $NF}' | sed 's/users:(("//;s/",.*//')
+if [ -n "$PIDS" ]; then
+    echo "Force-killing leftover node processes on port 8010..."
+    for PID in $PIDS; do
+        kill -9 "$PID"
+    done
+fi
+
+echo "VS Code Server stopped."
 
 ```
 set permissions on vscode_off.sh:
@@ -137,4 +153,22 @@ restart:
 
 then the FastAPI web-page on the iPad was updated with `/vscode_on` and `/vscode_off`. You can also check FastAPI on the host machine with `http://127.0.0.1:8000/docs`.
 
+---
+⭐ Why code-server works (and why the old method of code serve-web broke)
 
+Fedora’s code wrapper:
+
+    - used to support serve-web
+    - now silently redirects to code‑tunnel
+    - which is not the VS Code web server
+    - nd is incompatible with Safari/Firefox
+    - and breaks your automation
+
+But code-server is:
+
+    - stable
+    - headless
+    - browser‑native
+    - not tied to Electron
+    - not tied to GNOME
+    - not tied to code‑tunnel
