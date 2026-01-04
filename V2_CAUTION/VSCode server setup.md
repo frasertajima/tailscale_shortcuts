@@ -18,11 +18,20 @@ This is the IP behind your MagicDNS name:
 ##machine_name##.tail####.ts.net
 ```
 
-We will bind VS Code Server **only** to this IP.
+We will bind VS Code Server **only** to this IP. The original instructions were for `code serve-web` but installing `code-server` from Microsoft and launching that may survive a reboot better:
+
+`code-server` can be installed inside the distrobox container with:
+
+```bash
+curl -fsSL https://code-server.dev/install.sh | sh
+```
+
 
 ```bash
 # assuming vscode is already installed in a distrobox container run to check it works manually (with your IP):
-code serve-web --host 100.*.*.* --port 8010 --without-connection-token
+# code serve-web --host 100.*.*.* --port 8010 --without-connection-token
+code-server --bind-addr 100.*.*.*:8010 --auth none
+
 ```
 
 ---
@@ -60,7 +69,9 @@ jupyter lab --no-browser --ip=100.*.*.* --port=9999 --ServerApp.token='' --Serve
 ```bash
 # run jupyter labs and vscode serve in distrobox container
 jupyter lab --no-browser --ip=100.*.*.* --port=9999 --ServerApp.token='' --ServerApp.password='' &
-code serve-web --host 100.*.*.* --port 8010 --without-connection-token
+# code serve-web --host 100.*.*.* --port 8010 --without-connection-token
+code-server --bind-addr 100.*.*.*:8010 --auth none
+
 ```
 
 ---
@@ -80,10 +91,7 @@ jupyter lab \
   --notebook-dir=/home/##user## &
 
 # Start VS Code Server (Microsoft version)
-code serve-web \
-  --host 100.*.*.* \
-  --port 8010 \
-  --without-connection-token &
+code-server --bind-addr 100.*.*.*:8010 --auth none &
 
 ```
 set permissions on vscode_on.sh:
