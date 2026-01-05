@@ -77,23 +77,8 @@ code-server --bind-addr 100.*.*.*:8010 --auth none
 ---
 # Create shortcut scripts for tailscale automation
 
-/var/home/fraser/backup_service/vscode_on.sh (put in your own IP address and user home folder):
-```
-#!/usr/bin/env bash
+/var/home/fraser/backup_service/vscode_on.sh (use updated script in github directory):
 
-# Start JupyterLab
-jupyter lab \
-  --no-browser \
-  --ip=100.*.*.* \
-  --port=9999 \
-  --ServerApp.token='' \
-  --ServerApp.password='' \
-  --notebook-dir=/home/##user## &
-
-# Start VS Code Server (Microsoft version)
-code-server --bind-addr 100.*.*.*:8010 --auth none &
-
-```
 set permissions on vscode_on.sh:
 ```
 chmod +x /var/home/fraser/backup_service/vscode_on.sh
@@ -134,6 +119,42 @@ chmod +x /var/home/fraser/backup_service/vscode_off.sh
 
 - copy the updated `main.py` file from the github V2 directory (it should contain /ostree_upgrade, /vscode_on, /vscode_off along with the rest)
 - create your iPad and Siri shortcuts: "initiate code on" and "initiate code off" works ("initiate VSCode on" causes Siri to do a web search)
+
+## Tailscale serve commands:
+
+This removes all existing settings for tailscale serve and provides the working state (review before deleting):
+
+```bash
+sudo tailscale serve reset
+sudo tailscale serve --bg --set-path /jupyter http://localhost:9999/jupyter/
+sudo tailscale serve --bg --set-path /code http://localhost:8010
+```
+
+The result should be:
+
+```bash
+|-- /code    proxy http://localhost:8010
+|-- /jupyter proxy http://localhost:9999/jupyter/
+```
+
+This ensures:
+
+- JupyterLab loads instantly
+- VS Code Server now loads Jupyter notebooks instantly (unlike with http)
+
+---
+
+## 🎯Working URLs
+
+- **VS Code Server**
+    `https://<magicdns>/code/`
+
+- **JupyterLab**
+    `https://<magicdns>/jupyter/`
+
+
+Both load instantly on iPad Safari with no insecure warnings.
+
 - - -
 If your FastAPI ever fails to update on the iPad, check for multiple instances running by:
 
