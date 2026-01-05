@@ -16,6 +16,10 @@ It controls:
 This is the interpreter used when clicking the **Run Python File** arrow.  
 It is **independent** of the status‑bar interpreter and the terminal environment.
 
+![IMG_2762](https://github.com/user-attachments/assets/df732902-b290-4973-a51a-24ca2c48c27e)
+
+Before: `/bin/python3.14` After: `var/home/fraser/anaconda3/envs/py314/bin/python`
+
 ---
 
 ## 🔍 **Symptom**
