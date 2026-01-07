@@ -95,19 +95,24 @@ def run_reboot():
               "REBOOT TRIGGERED", out, err)
 
 
-# -----------------------------
-# RPM-OSTREE UPGRADE
-# -----------------------------
 def run_ostree_upgrade():
-    p = subprocess.Popen(
-        ["rpm-ostree", "upgrade"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True
+    log("=== OSTREE UPGRADE TRIGGERED ===")
+
+    upgrade_script = "/var/home/fraser/backup_service/ostree_upgrade.py"
+
+    # Spawn the upgrade script as a separate process
+    result = subprocess.Popen(
+        ["/usr/bin/env", "python3", upgrade_script],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL
     )
-    out, err = p.communicate()
-    write_log("/var/home/fraser/backup_service/ostree_upgrade.log",
-              "OSTREE UPGRADE TRIGGERED", out, err)
+
+    log(f"Spawned ostree upgrade script (PID {result.pid})")
+    log("Upgrade will continue in background")
+
+    return True
+
+
 
 # -----------------------------
 # VSCODE + JUPYTER LABS ON

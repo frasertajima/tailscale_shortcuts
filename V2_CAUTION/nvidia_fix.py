@@ -6,7 +6,10 @@ from pathlib import Path
 BASE_DIR = Path("/var/home/fraser/backup_service")
 LOG_FILE = BASE_DIR / "nvidia_fix.log"
 
-REQUIRED_ARG = "rd.driver.blacklist=nouveau"
+REQUIRED_ARGS = [
+    "rd.driver.blacklist=nouveau",
+    "nvidia-drm.modeset=1",
+]
 
 def log(msg):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -30,7 +33,7 @@ def run(cmd):
 def main():
     log("=== NVIDIA FIX STARTED ===")
 
-    # 1. Read current args
+    # Read current kernel args
     result = run(["rpm-ostree", "kargs"])
     if result.returncode != 0:
         log("ERROR: Could not read kernel args")
@@ -39,23 +42,25 @@ def main():
     current_args = result.stdout.strip().split()
     log(f"Current kernel args:\n{' '.join(current_args)}")
 
-    # 2. Build atomic rpm-ostree command
+    # Build atomic rpm-ostree command
     cmd = ["rpm-ostree", "kargs"]
 
-    # Delete if present
-    if REQUIRED_ARG in current_args:
-        cmd.append(f"--delete={REQUIRED_ARG}")
+    # Delete any existing copies of required args
+    for arg in REQUIRED_ARGS:
+        if arg in current_args:
+            cmd.append(f"--delete={arg}")
 
-    # Always append clean copy
-    cmd.append(f"--append={REQUIRED_ARG}")
+    # Append clean copies
+    for arg in REQUIRED_ARGS:
+        cmd.append(f"--append={arg}")
 
-    # 3. Execute atomic update
+    # Apply update
     result = run(cmd)
     if result.returncode != 0:
         log("ERROR: Failed to update kernel args")
         return
 
-    # 4. Reboot moved to separate module
+    log("=== NVIDIA FIX COMPLETED ===")
 
 if __name__ == "__main__":
     main()
