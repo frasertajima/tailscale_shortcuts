@@ -478,6 +478,8 @@ You bound each macro to:
 
 This gives you instant, reliable triggers.
 
+Note: MacDroid is not a free app. Another alternative on the Pixel is simply to load `https://##tailscale_machine_name##.tail##.ts.net/docs` in Chrome and create a desktop shortcut. This button then brings up the FastAPI webpage with all shortcuts available to run from there. 
+
 ---
 
 # 🟦 **8. Verified the full remote workflow**
