@@ -21,7 +21,10 @@ This is the IP behind your MagicDNS name:
 We will bind VS Code Server **only** to this IP. The original instructions were for `code serve-web` but installing `code-server` from Microsoft and launching that may survive a reboot better:
 
 `code-server` can be installed inside the distrobox container with:
-
+```bash
+conda install conda-forge::code-server
+```
+or:
 ```bash
 curl -fsSL https://code-server.dev/install.sh | sh
 ```
