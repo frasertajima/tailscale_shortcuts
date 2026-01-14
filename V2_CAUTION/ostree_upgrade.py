@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 
 BASE_DIR = Path("/var/home/fraser/backup_service")
-LOG_FILE = BASE_DIR / "upgrade.log"
+LOG_FILE = BASE_DIR / "ostree_upgrade.log"
 
 def log(msg):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
