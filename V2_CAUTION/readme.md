@@ -6,6 +6,8 @@ _vscode_on.sh has been refactored to enable https connections for VS Code and Ju
 
 _`main.py` has been refactored to be modular and enable timestamps in the logs for each shortcut. `/rpm_ostree` enables remote "rpm-ostree upgrade" in Fedora Silverblue without user intervention. Once finished, you can trigger the `/reboot` shortcut to complete the upgrade when convenient. `/vscode_on` starts up the VSCode server from Microsoft in a distrobox container that is set up as well as a Jupyter Labs server. VSCode does not seem to load Jupyter Notebooks on the iPad so Jupyter Labs is needed for machine learning work (and is fast). This enables full VSCode and Jupyter Labs access remotely on your iPad without limitations or performance issues (VSCode loads python, fortran files instantly but not Jupyter Notebooks). If you ever need to shutdown your servers cleanly, `/vscode_off` can be called by Siri (but leaving them on is not a burden)._
 
+---
+
 _This folder contains version 2 of our tailscale shortcuts that includes a shortcut to fix the nvidia driver (whenever Fedora Silverblue updates, there is a good chance that `nvidia-smi` will no longer access the driver so we have to fix it manually)._
 
 _Normally, the rpm-ostree change requires 'systemctl reboot' but rather than bunch that in with the  
