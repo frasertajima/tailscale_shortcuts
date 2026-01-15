@@ -1,4 +1,5 @@
 _Jan 15: added /wol using Synology NAS, tailscale and iOS shortcuts_
+
 _fixes to /nvidia_fix and /ostree_upgrade to make sure they are triggered._
 
 _vscode_on.sh has been refactored to enable https connections for VS Code and Jupyter Labs. This avoids the insecure site message (even though it is secure inside Tailscale) and it also enables VS Code to load Jupyter Notebooks properly! The tailscale serve commands are set out in `update_to_https.md`. We did lose the VSCode icon on the iPad homescreen shortcut, however. Getting it back is a bit of a hassle._
