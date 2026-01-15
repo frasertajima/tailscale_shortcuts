@@ -4,7 +4,7 @@ A reproducible, tailnet‑native automation pipeline
 
 This document describes how to expose a Wake‑on‑LAN (WOL) endpoint from a Synology NAS using FastAPI (Python 3.14) and Tailscale Serve. The endpoint can be triggered from iOS Shortcuts to wake a remote Linux workstation (e.g., Fedora Silverblue).
 
-The design is fully modular, reproducible, and requires no port‑forwarding or public exposure. No iOS or Android apps are required.
+The design is fully modular, reproducible, and requires no port‑forwarding or public exposure. No additional iOS or Android apps are required.
 
 ---
 
@@ -13,20 +13,25 @@ The design is fully modular, reproducible, and requires no port‑forwarding or 
 Synology NAS
 
 • Python 3.14 installed via Synology Package Centre (Community)
+
 • Tailscale installed and logged in the NAS and computer
+
 • SSH access enabled
 
 
 Target machine (e.g., Fedora Silverblue)
 
 • Ethernet connection
+
 • WOL enabled in BIOS
+
 • MAC address available
 
 
 Client
 
 • iOS device with Shortcuts app
+
 • Tailscale installed
 
 
@@ -209,14 +214,18 @@ Fedora Silverblue Desktop Wakes
 Shortcut returns 307 Temporary Redirect
 
 • You are hitting /wol/ instead of /wol
+
 • Fix: FastAPI route for /wol/ (included above)
 
 
 Shortcut returns 200 OK but machine does not wake
 
 • NIC lost WOL after sleep → install dispatcher script
+
 • Wrong MAC address (Wi‑Fi instead of Ethernet)
+
 • NIC LED off → no standby power
+
 • BIOS settings incorrect (ErP enabled, S5 WOL disabled)
 
 
@@ -232,9 +241,13 @@ NAS cannot find Python 3.14
 This setup provides:
 
 • A secure, tailnet‑only WOL endpoint
+
 • A FastAPI microservice running on the NAS
+
 • A clean Tailscale Serve integration
+
 • A Siri‑triggerable automation pipeline
+
 • A Silverblue‑compatible WOL persistence fix
 
 
