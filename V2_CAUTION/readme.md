@@ -1,5 +1,11 @@
 _Feb 6: added Ollama and OCR shortcuts_
 
+
+
+https://github.com/user-attachments/assets/b90a134c-0915-40ef-805c-4d367d9b9f37
+
+
+
 _Jan 15: added /wol using Synology NAS, tailscale and iOS shortcuts_
 
 _fixes to /nvidia_fix and /ostree_upgrade to make sure they are triggered._
