@@ -4,7 +4,8 @@ _Feb 6: added Ollama and OCR shortcuts_
 
 https://github.com/user-attachments/assets/b90a134c-0915-40ef-805c-4d367d9b9f37
 
-
+If github video is not working:
+https://youtu.be/4bj_qR9z3jU?si=rILM4We46zytAv7L
 
 _Jan 15: added /wol using Synology NAS, tailscale and iOS shortcuts_
 
