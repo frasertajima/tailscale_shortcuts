@@ -4,6 +4,7 @@
 _A Tailscale‑secured, cross‑platform orchestration system triggered from your Pixel or iOS device. This is faster than opening a command line and typing “uv run backup.py” for example._
 
 ---
+_February 6, 2026: Adding Ollama and OCR shortcuts (using `ollama run glm-ocr Text Recognition:`; glm-ocr is fast and accurate in OCR when it works)._
 
 _January 1, 2026: Kleopatra script is now fully remote capable and hands free with no user intervention for PIN required. A new kleopatra.log will indicate whether it worked. backup_service.service was updated to work properly upon reboot. main.py was updated to incorporate the improvements. Make sure to add polkit as outlined below to enable pcscd to be reset without the need for user intervention of sudo._
 
