@@ -6,6 +6,7 @@ from datetime import datetime
 import json
 import webbrowser
 from threading import Timer
+from setup_thinkpad import run_setup, load_status, new_status, save_status
 from missouri_query import (
     run_missouri_query,
     run_missouri_select,
@@ -335,6 +336,32 @@ def trigger_ocr_images(background_tasks: BackgroundTasks):
     background_tasks.add_task(run_ocr_images)
     return {"status": "ocr_images_started"}
 
+# -----------------------------
+# SETUP THINKPAD
+# -----------------------------
+@app.post("/setup_thinkpad")
+def trigger_setup_thinkpad(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_setup)
+    return {"status": "setup_thinkpad_started"}
+
+@app.get("/setup_thinkpad_status")
+def setup_thinkpad_status():
+    return load_status()
+
+@app.post("/setup_thinkpad_reset")
+def setup_thinkpad_reset():
+    status = new_status()
+    save_status(status)
+    return status
+
+@app.get("/setup_thinkpad", response_class=HTMLResponse)
+def setup_thinkpad_page():
+    with open("/var/home/fraser/backup_service/templates/setup_thinkpad.html") as f:
+        return f.read()
+
+# -----------------------------
+# COBOL DB2
+# -----------------------------
 @app.get("/test_db2")
 def test_db2():
     """Query DB2 and return JSON results"""
