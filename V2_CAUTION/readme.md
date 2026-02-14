@@ -1,3 +1,8 @@
+_Feb 13: added Setup ThinkPad workflow and console_
+
+<img width="1624" height="1842" alt="image" src="https://github.com/user-attachments/assets/9948703e-ddd2-41e9-bba0-c61162f168df" />
+
+
 _Feb 6: added Ollama and OCR shortcuts_
 
 
