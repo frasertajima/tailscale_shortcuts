@@ -28,7 +28,7 @@ def run(cmd):
 def main():
     log("=== OSTREE UPGRADE STARTED ===")
 
-    result = run(["rpm-ostree", "upgrade", "--allow-inactive"])
+    result = run(["rpm-ostree", "upgrade"])
     if result.returncode != 0:
         log("ERROR: rpm-ostree upgrade failed")
         return
