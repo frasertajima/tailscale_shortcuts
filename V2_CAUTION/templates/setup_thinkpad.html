@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Setup ThinkPad</title>
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                font-family: "IBM Plex Mono", monospace;
+                background: #fafafa;
+                color: #1a1a1a;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 40px 20px;
+            }
+            .header {
+                margin-bottom: 36px;
+                text-align: center;
+                padding-bottom: 20px;
+                border-bottom: 1px solid #e0e0e0;
+                width: 100%;
+                max-width: 520px;
+            }
+            .header h1 {
+                font-size: 18px;
+                font-weight: 400;
+                letter-spacing: 0.5px;
+            }
+            .header .slash {
+                color: #00ff41;
+                font-weight: 500;
+            }
+            .header .subtitle {
+                font-size: 10px;
+                color: #888;
+                margin-top: 6px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .phase-banner {
+                width: 100%;
+                max-width: 520px;
+                padding: 14px 20px;
+                border-radius: 6px;
+                margin-bottom: 28px;
+                font-size: 12px;
+                font-weight: 500;
+                text-align: center;
+                letter-spacing: 0.3px;
+            }
+            .phase-banner.waiting {
+                background: #f0f0f0;
+                color: #888;
+                border: 1px solid #ddd;
+            }
+            .phase-banner.running {
+                background: rgba(0, 255, 65, 0.08);
+                color: #1a7a2e;
+                border: 1px solid rgba(0, 255, 65, 0.3);
+            }
+            .phase-banner.needs-reboot {
+                background: rgba(255, 170, 0, 0.08);
+                color: #8a6000;
+                border: 1px solid rgba(255, 170, 0, 0.3);
+            }
+            .phase-banner.complete {
+                background: rgba(0, 255, 65, 0.1);
+                color: #0a5c1a;
+                border: 1px solid rgba(0, 255, 65, 0.4);
+            }
+            .phase-banner.has-failures {
+                background: rgba(255, 60, 60, 0.08);
+                color: #8a2000;
+                border: 1px solid rgba(255, 60, 60, 0.3);
+            }
+            .steps {
+                width: 100%;
+                max-width: 520px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .step {
+                padding: 18px 20px;
+                background: rgba(255, 255, 255, 0.55);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border: 1px solid rgba(200, 215, 230, 0.5);
+                border-radius: 6px;
+                box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+                display: flex;
+                align-items: flex-start;
+                gap: 14px;
+            }
+            .step-icon {
+                font-size: 18px;
+                flex-shrink: 0;
+                width: 28px;
+                text-align: center;
+                line-height: 1.2;
+            }
+            .step-body {
+                flex: 1;
+                min-width: 0;
+            }
+            .step-name {
+                font-size: 13px;
+                font-weight: 500;
+                margin-bottom: 3px;
+            }
+            .step-detail {
+                font-size: 10px;
+                color: #5a6a7a;
+                letter-spacing: 0.3px;
+                word-break: break-word;
+            }
+            .step.status-pending {
+                opacity: 0.45;
+            }
+            .step.status-running {
+                border-color: rgba(0, 255, 65, 0.4);
+                box-shadow: 0 2px 12px rgba(0, 255, 65, 0.1);
+            }
+            .step.status-done {
+                border-color: rgba(0, 255, 65, 0.3);
+            }
+            .step.status-skipped {
+                opacity: 0.7;
+            }
+            .step.status-done_needs_reboot {
+                border-color: rgba(255, 170, 0, 0.4);
+                box-shadow: 0 2px 12px rgba(255, 170, 0, 0.1);
+            }
+            .step.status-failed {
+                border-color: rgba(255, 60, 60, 0.4);
+                box-shadow: 0 2px 12px rgba(255, 60, 60, 0.1);
+            }
+            .actions {
+                width: 100%;
+                max-width: 520px;
+                margin-top: 28px;
+                display: flex;
+                gap: 12px;
+            }
+            .btn {
+                font-family: "IBM Plex Mono", monospace;
+                font-size: 12px;
+                font-weight: 500;
+                padding: 14px 24px;
+                border-radius: 6px;
+                border: 1px solid rgba(200, 215, 230, 0.5);
+                cursor: pointer;
+                transition: all 0.2s;
+                flex: 1;
+                text-align: center;
+            }
+            .btn-run {
+                background: rgba(0, 255, 65, 0.1);
+                color: #0a5c1a;
+                border-color: rgba(0, 255, 65, 0.3);
+            }
+            .btn-run:hover {
+                background: rgba(0, 255, 65, 0.2);
+                box-shadow: 0 2px 12px rgba(0, 255, 65, 0.15);
+            }
+            .btn-run:disabled {
+                opacity: 0.4;
+                cursor: default;
+                box-shadow: none;
+            }
+            .btn-reset {
+                background: rgba(255, 255, 255, 0.55);
+                color: #5a6a7a;
+            }
+            .btn-reset:hover {
+                border-color: #aaa;
+            }
+            .timestamps {
+                width: 100%;
+                max-width: 520px;
+                margin-top: 28px;
+                font-size: 10px;
+                color: #aaa;
+                text-align: center;
+            }
+            @keyframes pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            .running-pulse {
+                animation: pulse 1.5s ease-in-out infinite;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1><span class="slash">/</span>SETUP THINKPAD</h1>
+            <div class="subtitle">ostree upgrade &middot; nvidia &middot; yubikey &middot; vscode &middot; backup</div>
+        </div>
+
+        <div id="phase-banner" class="phase-banner waiting">Loading...</div>
+
+        <div id="steps" class="steps"></div>
+
+        <div class="actions">
+            <button id="btn-run" class="btn btn-run" onclick="runSetup()">
+                Run / Resume
+            </button>
+            <button id="btn-reset" class="btn btn-reset" onclick="resetSetup()">
+                Reset
+            </button>
+        </div>
+
+        <div id="timestamps" class="timestamps"></div>
+
+        <script>
+            const STEP_LABELS = {
+                ostree_upgrade: "ostree upgrade",
+                nvidia_fix: "nvidia fix",
+                security_key: "security key",
+                vscode_on: "vscode + jupyter",
+                backup: "backup",
+            };
+
+            const STATUS_ICONS = {
+                pending: "\u2500",
+                running: "\u25CB",
+                done: "\u2713",
+                skipped: "\u2013",
+                done_needs_reboot: "\u21BB",
+                failed: "\u2717",
+            };
+
+            const STATUS_LABELS = {
+                pending: "pending",
+                running: "running",
+                done: "done",
+                skipped: "not needed",
+                done_needs_reboot: "reboot needed",
+                failed: "failed",
+            };
+
+            let polling = null;
+
+            function formatTime(iso) {
+                if (!iso) return "";
+                const d = new Date(iso);
+                return d.toLocaleString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
+                });
+            }
+
+            function render(data) {
+                const banner = document.getElementById("phase-banner");
+                const steps = document.getElementById("steps");
+                const timestamps = document.getElementById("timestamps");
+                const btnRun = document.getElementById("btn-run");
+
+                // Determine overall state
+                const phase = data.phase;
+                const stepValues = Object.values(data.steps);
+                const hasFailure = stepValues.some(s => s.status === "failed");
+                const needsReboot = stepValues.some(s => s.status === "done_needs_reboot");
+                const isRunning = stepValues.some(s => s.status === "running");
+                const isComplete = phase === "complete";
+
+                // Phase banner
+                if (isComplete && !hasFailure) {
+                    banner.className = "phase-banner complete";
+                    banner.textContent = "Setup complete - ThinkPad is ready";
+                } else if (hasFailure) {
+                    banner.className = "phase-banner has-failures";
+                    const failedNames = Object.entries(data.steps)
+                        .filter(([, s]) => s.status === "failed")
+                        .map(([k]) => STEP_LABELS[k])
+                        .join(", ");
+                    banner.textContent = "Failed: " + failedNames;
+                } else if (needsReboot) {
+                    banner.className = "phase-banner needs-reboot";
+                    banner.textContent = "Reboot required - then run /setup_thinkpad again";
+                } else if (isRunning) {
+                    banner.className = "phase-banner running";
+                    banner.innerHTML = '<span class="running-pulse">Running...</span>';
+                } else {
+                    banner.className = "phase-banner waiting";
+                    banner.textContent = "Ready - tap Run / Resume to start";
+                }
+
+                // Disable run button while running or when reboot needed
+                btnRun.disabled = isRunning;
+                if (needsReboot) {
+                    btnRun.textContent = "Reboot first";
+                    btnRun.disabled = true;
+                } else if (isComplete) {
+                    btnRun.textContent = "Run again";
+                    btnRun.disabled = false;
+                } else if (isRunning) {
+                    btnRun.textContent = "Running...";
+                } else {
+                    btnRun.textContent = "Run / Resume";
+                }
+
+                // Steps
+                steps.innerHTML = "";
+                for (const [key, step] of Object.entries(data.steps)) {
+                    const el = document.createElement("div");
+                    const statusClass = "status-" + step.status;
+                    el.className = "step " + statusClass;
+
+                    const icon = STATUS_ICONS[step.status] || "\u2500";
+                    const iconClass = step.status === "running" ? "running-pulse" : "";
+                    const detail = step.detail || STATUS_LABELS[step.status] || step.status;
+
+                    el.innerHTML =
+                        '<div class="step-icon ' + iconClass + '">' + icon + "</div>" +
+                        '<div class="step-body">' +
+                        '<div class="step-name">' + STEP_LABELS[key] + "</div>" +
+                        '<div class="step-detail">' + detail + "</div>" +
+                        "</div>";
+                    steps.appendChild(el);
+                }
+
+                // Timestamps
+                timestamps.textContent =
+                    "started " + formatTime(data.started) +
+                    " \u00B7 updated " + formatTime(data.updated);
+
+                // Auto-poll while running
+                if (isRunning && !polling) {
+                    polling = setInterval(fetchStatus, 3000);
+                } else if (!isRunning && polling) {
+                    clearInterval(polling);
+                    polling = null;
+                }
+            }
+
+            async function fetchStatus() {
+                try {
+                    const resp = await fetch("/setup_thinkpad_status");
+                    const data = await resp.json();
+                    render(data);
+                } catch (e) {
+                    console.error("Failed to fetch status:", e);
+                }
+            }
+
+            async function runSetup() {
+                document.getElementById("btn-run").disabled = true;
+                try {
+                    await fetch("/setup_thinkpad", { method: "POST" });
+                    // Start polling immediately
+                    if (!polling) {
+                        polling = setInterval(fetchStatus, 3000);
+                    }
+                    // Fetch once right away
+                    setTimeout(fetchStatus, 500);
+                } catch (e) {
+                    console.error("Failed to trigger setup:", e);
+                }
+            }
+
+            async function resetSetup() {
+                if (!confirm("Reset setup state? This will clear all progress.")) return;
+                try {
+                    await fetch("/setup_thinkpad_reset", { method: "POST" });
+                    await fetchStatus();
+                } catch (e) {
+                    console.error("Failed to reset:", e);
+                }
+            }
+
+            // Initial load
+            fetchStatus();
+        </script>
+    </body>
+</html>
