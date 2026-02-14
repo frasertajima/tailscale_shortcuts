@@ -1,5 +1,5 @@
 
-# 🚀 **Remote Backup + YubiKey Warm‑Up Workflow (extensible to any python script)**
+# **Remote Backup + YubiKey Warm‑Up Workflow (extensible to any python script)**
 
 _A Tailscale‑secured, cross‑platform orchestration system triggered from your Pixel or iOS device. This is faster than opening a command line and typing “uv run backup.py” for example._
 
