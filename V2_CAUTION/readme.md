@@ -1,6 +1,10 @@
 _Feb 13: added Setup ThinkPad workflow and console_
 
+Hey Siri:
+
 https://youtu.be/uVu5i0SD_sQ?si=vThf5okRAwZI4tNH
+
+Continuation after reboot:
 
 https://youtu.be/dwYJQBY0U8k?si=DwByblKtXwtVbBCM
 
