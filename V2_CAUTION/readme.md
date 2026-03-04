@@ -1,3 +1,5 @@
+_March 4: Ollama on and of are unnecessary if Ollama is run only in a distrobox container (as opposed to the Fedora Silverblue host). Indeed, installing Ollama on the host causes update issues later._
+
 _Feb 13: added Setup ThinkPad workflow and console_
 
 Hey Siri:
