@@ -4,7 +4,7 @@
 _A Tailscale‑secured, cross‑platform orchestration system triggered from your Pixel or iOS device. This is faster than opening a command line and typing “uv run backup.py” for example._
 
 ---
-_April 2, 2026: Added cohere_transcription shortcuts. To get this to run, you need to replicate the cohere transcribe install from pip in the uv environment (I did this in the backup_service directory just to make sure):_
+_April 2, 2026: Added cohere_transcription shortcuts under the /V2_CAUTION folder. To get this to run, you need to replicate the cohere transcribe install from pip in the uv environment (I did this in the backup_service directory just to make sure):_
 ```
 uv add torch torchvision transformers librosa accelerate
 ```
