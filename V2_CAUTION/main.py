@@ -20,6 +20,8 @@ app = FastAPI()
 # Host scripts
 KLEO_SCRIPT = Path("/var/home/fraser/backup_service/kleopatra.py")
 NVIDIA_SCRIPT = Path("/var/home/fraser/backup_service/nvidia_fix.py")
+COHERE_SCRIPT = Path("/var/home/fraser/machine_learning/cohere_transcribe/batch_transcribe.py")
+
 
 # Container script
 BACKUP_SCRIPT = "/var/home/fraser/backup_service/backup.py"
@@ -220,6 +222,22 @@ def run_ocr_images():
     out, err = p.communicate()
     write_log("/var/home/fraser/backup_service/ollama.log",
               "OCR IMAGES TRIGGERED", out, err)
+    
+
+# -----------------------------
+# COHERE TRANSCRIPTION MODULE
+# -----------------------------
+def run_cohere_transcription():
+    p = subprocess.Popen(
+        ["/var/home/fraser/.cargo/bin/uv", "run",  str(COHERE_SCRIPT)],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True
+    )
+    out, err = p.communicate()
+    write_log("/var/home/fraser/backup_service/cohere_transcription.log",
+              "COHERE TRANSCRIPTION TRIGGERED", out, err)
+
 
 # -----------------------------
 # COBOL DB2 QUERY TEST
@@ -335,6 +353,11 @@ def trigger_ollama_off(background_tasks: BackgroundTasks):
 def trigger_ocr_images(background_tasks: BackgroundTasks):
     background_tasks.add_task(run_ocr_images)
     return {"status": "ocr_images_started"}
+
+@app.post("/cohere_transcription")
+def trigger_cohere_transcription(background_tasks: BackgroundTasks):
+    background_tasks.add_task(run_cohere_transcription)
+    return {"status": "cohere_transcription_started"}
 
 # -----------------------------
 # SETUP THINKPAD
