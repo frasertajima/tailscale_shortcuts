@@ -4,6 +4,13 @@
 _A Tailscale‑secured, cross‑platform orchestration system triggered from your Pixel or iOS device. This is faster than opening a command line and typing “uv run backup.py” for example._
 
 ---
+_April 2, 2026: Added cohere_transcription shortcuts. To get this to run, you need to replicate the cohere transcribe install from pip in the uv environment (I did this in the backup_service directory just to make sure):_
+```
+uv add torch torchvision transformers librosa accelerate
+```
+_My `/cohere_transcribe` directory location will be different from yours so the script will need to be modified accordingly. The siri shortcut 'Initiate transcribe' works. Don't forget to restart the fastapi server with `sudo systemctl restart backup_service`._
+
+---
 _February 6, 2026: Adding Ollama and OCR shortcuts (using `ollama run glm-ocr Text Recognition:`; glm-ocr is fast and accurate in OCR when it works)._
 
 _January 1, 2026: Kleopatra script is now fully remote capable and hands free with no user intervention for PIN required. A new kleopatra.log will indicate whether it worked. backup_service.service was updated to work properly upon reboot. main.py was updated to incorporate the improvements. Make sure to add polkit as outlined below to enable pcscd to be reset without the need for user intervention of sudo._
